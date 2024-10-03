@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CheckerController;
 use App\Http\Controllers\API\UndianController;
 use App\Http\Controllers\API\PesertaController;
 use App\Http\Controllers\API\KategoriController;
@@ -27,3 +28,5 @@ Route::get('subkategori', [SubkategoriController::class, 'index']); // Menampilk
 Route::get('subkategori/{id}', [SubkategoriController::class, 'show']); // Menampilkan subkategori berdasarkan ID
 
 Route::put('peserta/{id}/validate', [ValidationController::class, 'validatePeserta']);
+
+Route::put('/peserta/validate-by-code/{kode_peserta}', [CheckerController::class, 'validateByCode']);
