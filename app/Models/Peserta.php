@@ -10,6 +10,13 @@ class Peserta extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['nama', 'email'];
+    protected $fillable = [
+        'nama',
+        'merchant',
+        'titik_kumpul',
+        'nomor_bus',
+        'kode_peserta',
+        'is_valid'
+    ];
     protected $dates = ['deleted_at'];
 }

@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pesertas', function (Blueprint $table) {
-            $table->id();
-            $table->string('nama');
-            $table->timestamps();
+        Schema::table('pesertas', function (Blueprint $table) {
+            $table->boolean('is_valid')->default(false);
         });
     }
 
@@ -23,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pesertas');
+        Schema::table('pesertas', function (Blueprint $table) {
+            $table->dropColumn('is_valid');
+        });
     }
 };
