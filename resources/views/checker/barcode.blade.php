@@ -33,6 +33,7 @@
         <p>Silakan scan barcode peserta untuk memvalidasi.</p>
         <div id="interactive" class="viewport"></div>
         <p id="status" class="message">Menunggu scan...</p>
+        <p id="scanned-code" class="message"></p> <!-- Menampilkan kode yang discan -->
     </div>
 
     <script>
@@ -47,7 +48,9 @@
                     }
                 },
                 decoder: {
-                    readers: ["code_128_reader"] // Format barcode
+                    readers: [
+                        "qr_code_reader"
+                    ] // Format barcode yang di-scan, ganti jika menggunakan QR code
                 }
             }, function(err) {
                 if (err) {
@@ -60,7 +63,10 @@
 
             Quagga.onDetected(function(data) {
                 let scannedCode = data.codeResult.code;
-                document.getElementById("status").textContent = `Barcode ditemukan: ${scannedCode}`;
+
+                // Menampilkan kode yang di-scan di halaman
+                document.getElementById("scanned-code").textContent = `Kode ditemukan: ${scannedCode}`;
+                document.getElementById("status").textContent = "Kode berhasil di-scan, memvalidasi...";
 
                 // Mengirim hasil pemindaian ke backend untuk validasi
                 validatePeserta(scannedCode);
@@ -68,7 +74,7 @@
 
             // Fungsi untuk mengirim hasil barcode ke backend untuk validasi
             function validatePeserta(scannedCode) {
-                fetch(`/api/peserta/validate-by-code/${scannedCode}`, {
+                fetch(`https://reonaldi-saputro.website/api/peserta/validate-by-code/${scannedCode}`, {
                         method: 'PUT',
                         headers: {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}'
@@ -85,7 +91,10 @@
                                 'Peserta tidak valid atau tidak ditemukan';
                         }
                     })
-                    .catch(error => console.error('Error:', error));
+                    .catch(error => {
+                        console.error('Error:', error);
+                        document.getElementById("status").textContent = 'Error memvalidasi peserta';
+                    });
             }
         });
     </script>

@@ -42,10 +42,10 @@ class PesertaResource extends Resource
                     ->required()
                     ->maxLength(255),
                 // Checkbox untuk validasi
-                Checkbox::make('is_valid')
-                    ->label('Validasi Peserta')
-                    ->helperText('Tandai peserta sebagai valid untuk ikut undian.')
-                    ->required(),
+                // Checkbox::make('is_valid')
+                //     ->label('Validasi Peserta')
+                //     ->helperText('Tandai peserta sebagai valid untuk ikut undian.')
+                //     ->required(),
             ]);
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Models\Undian;
 use App\Models\Peserta;
 use Illuminate\Http\Request;
 use App\Helpers\ResponseFormatter;
@@ -9,12 +10,20 @@ use App\Http\Controllers\Controller;
 
 class ValidationController extends Controller
 {
-    public function validatePeserta($id, Request $request)
+    public function validatePeserta($pesertaId, Request $request)
     {
-        // Cari peserta berdasarkan ID
-        $peserta = Peserta::find($id);
+        // Cari data undian berdasarkan peserta_id dari tabel undian (history)
+        $undian = Undian::where('peserta_id', $pesertaId)->with('peserta')->first();
 
-        // Jika peserta tidak ditemukan
+        // Jika tidak ada undian terkait peserta tersebut (belum pernah diundi)
+        if (!$undian) {
+            return ResponseFormatter::error(null, 'Peserta belum diundi atau tidak ditemukan', 404);
+        }
+
+        // Ambil data peserta yang terkait dengan undian tersebut
+        $peserta = $undian->peserta;
+
+        // Jika peserta tidak ditemukan (meskipun seharusnya ada)
         if (!$peserta) {
             return ResponseFormatter::error(null, 'Peserta tidak ditemukan', 404);
         }

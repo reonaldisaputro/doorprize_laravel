@@ -8,6 +8,8 @@ use App\Models\Undian;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Filament\Forms\Components\Checkbox;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\UndianResource\Pages;
@@ -30,6 +32,11 @@ class UndianResource extends Resource
                 Forms\Components\Select::make('peserta_id')
                     ->relationship('peserta', 'nama')
                     ->required(),
+                Checkbox::make('peserta_id')
+                    ->relationship('peserta', 'is_valid')
+                    ->label('Validasi Peserta')
+                    ->helperText('Tandai peserta sebagai valid untuk ikut undian.')
+                    ->required(),
             ]);
     }
 
@@ -40,6 +47,9 @@ class UndianResource extends Resource
                 TextColumn::make('subkategori.nama')->label('Subkategori')->sortable(),
                 TextColumn::make('peserta.nama')->label('Nama Peserta')->sortable(),
                 TextColumn::make('peserta.kode_peserta')->label('Kode Peserta')->sortable(),
+                IconColumn::make('peserta.is_valid') // Update to reflect peserta's is_valid
+                    ->boolean()
+                    ->label('Valid'),
                 TextColumn::make('peserta.merchant')->label('Merchant')->sortable(),
                 TextColumn::make('peserta.titik_kumpul')->label('Titik Kumpul')->sortable(),
                 TextColumn::make('peserta.nomor_bus')->label('Nomor Bus')->sortable(),
