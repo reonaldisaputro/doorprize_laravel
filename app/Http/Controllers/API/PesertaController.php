@@ -6,12 +6,19 @@ use App\Models\Peserta;
 use Illuminate\Http\Request;
 use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class PesertaController extends Controller
 {
     public function index()
     {
+
         try {
+            // $user = Auth::user();
+            // dd($user);
+            // if (!$user) {
+            //     return response()->json(['error' => 'Unauthorized'], 401);
+            // }
             $peserta = Peserta::all();
             if ($peserta->isEmpty()) {
                 return ResponseFormatter::error(null, "Tidak ada data peserta yang ditemukan", 404);

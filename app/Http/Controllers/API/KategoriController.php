@@ -12,7 +12,9 @@ class KategoriController extends Controller
     // Menampilkan semua kategori
     public function index()
     {
+
         try {
+
             $kategori = Kategori::all();
             if ($kategori->isEmpty()) {
                 return ResponseFormatter::error(null, "Tidak ada data kategori yang ditemukan", 404);

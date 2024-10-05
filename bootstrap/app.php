@@ -12,7 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        $middleware->alias([
+            'with_fast_api_key' => \App\Http\Middleware\VerifyFastApiKey::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

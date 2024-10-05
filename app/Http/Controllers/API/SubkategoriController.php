@@ -36,4 +36,21 @@ class SubkategoriController extends Controller
             return ResponseFormatter::error('Terjadi kesalahan saat mengambil data', $e->getMessage(), 500);
         }
     }
+
+    // Function untuk mendapatkan subkategori berdasarkan kategori_id
+    public function getSubkategoriByKategoriId($kategoriId)
+    {
+        try {
+            // Mencari subkategori berdasarkan kategori_id
+            $subkategori = Subkategori::where('kategori_id', $kategoriId)->get();
+
+            if ($subkategori->isEmpty()) {
+                return ResponseFormatter::error(null, 'Tidak ada subkategori untuk kategori ini', 404);
+            }
+
+            return ResponseFormatter::success($subkategori, 'Daftar subkategori berhasil diambil');
+        } catch (\Exception $e) {
+            return ResponseFormatter::error(null, 'Terjadi kesalahan saat mengambil data subkategori', 500);
+        }
+    }
 }
