@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Exports\PesertaExport;
+use App\Imports\PesertaImport;
 use Filament\Forms;
 use Filament\Tables;
 use App\Models\Peserta;
@@ -15,6 +17,8 @@ use App\Filament\Resources\PesertaResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\PesertaResource\RelationManagers;
 use Filament\Tables\Columns\IconColumn;
+use Maatwebsite\Excel\Facades\Excel;
+use Filament\Tables\Actions\Action;
 
 class PesertaResource extends Resource
 {
@@ -75,6 +79,24 @@ class PesertaResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
+            ])
+            ->headerActions([
+                Action::make('export')
+                    ->label('Export Excel')
+                    ->icon('heroicon-o-rectangle-stack')
+                    ->action(fn() => Excel::download(new PesertaExport, 'peserta.xlsx')),
+
+                Action::make('import')
+                    ->label('Import Excel')
+                    ->icon('heroicon-o-rectangle-stack')
+                    ->form([
+                        Forms\Components\FileUpload::make('file')
+                            ->required()
+                            ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
+                    ])
+                    ->action(function (array $data) {
+                        Excel::import(new PesertaImport, $data['file']);
+                    }),
             ]);
     }
 

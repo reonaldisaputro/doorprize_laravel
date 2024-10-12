@@ -19,7 +19,7 @@ class KategoriSubkategoriSeeder extends Seeder
         Subkategori::create([
             'kategori_id' => $kategori100->id,
             'nama' => 'voucher 100 indomaret',
-            'qty' => 3,
+            'qty' => 15,
         ]);
 
         Subkategori::create([

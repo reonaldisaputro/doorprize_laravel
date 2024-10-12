@@ -53,4 +53,17 @@ class SubkategoriController extends Controller
             return ResponseFormatter::error(null, 'Terjadi kesalahan saat mengambil data subkategori', 500);
         }
     }
+
+    public function countAllSubkategori()
+    {
+        try {
+            // Hitung total subkategori
+            $jumlahSubkategori = Subkategori::count();
+
+            // Return response dengan jumlah subkategori
+            return ResponseFormatter::success($jumlahSubkategori, "Total jumlah subkategori berhasil dihitung");
+        } catch (\Exception $e) {
+            return ResponseFormatter::error('Terjadi kesalahan saat menghitung subkategori', $e->getMessage(), 500);
+        }
+    }
 }

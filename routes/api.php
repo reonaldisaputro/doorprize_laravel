@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CheckerController;
+use App\Http\Controllers\CounterController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\UndianController;
 use App\Http\Controllers\API\PesertaController;
@@ -58,6 +59,8 @@ Route::middleware('with_fast_api_key', 'auth:sanctum')->group(function () {
     Route::delete('peserta/{id}', [PesertaController::class, 'destroy']);
 
     Route::post('undi/{subkategoriId}', [UndianController::class, 'undi']);
+    // Route::post('/undi/{subkategoriId}/{jumlahPerUndian}', [UndianController::class, 'undi']);
+
     Route::get('undian/history', [UndianController::class, 'history']);
     Route::get('undian/export', [UndianController::class, 'export']);
 
@@ -73,4 +76,8 @@ Route::middleware('with_fast_api_key', 'auth:sanctum')->group(function () {
     Route::put('peserta/{id}/validate', [ValidationController::class, 'validatePeserta']);
 
     Route::put('/peserta/validate-by-code/{kode_peserta}', [CheckerController::class, 'validateByCode']);
+
+    Route::get('/subkategori-count/count', [SubkategoriController::class, 'countAllSubkategori']);
+
+    Route::post('/increment-counter', [CounterController::class, 'incrementCounter']);
 });
