@@ -38,7 +38,14 @@ class SubkategoriController extends Controller
             $subkategori = Subkategori::with('kategori')->find($id);
 
             if (!$subkategori) {
-                return response()->json(['message' => 'Subkategori tidak ditemukan'], 404);
+                return ResponseFormatter::error([
+                    'message' => 'Subkategori tidak ditemukan'
+                ], 'Subkategori tidak ditemukan', 404);
+            }
+
+            // Jika subkategori memiliki gambar, buat URL lengkap
+            if ($subkategori->image) {
+                $subkategori->image_url = config('app.url') . '/storage/' . $subkategori->image;
             }
 
             return ResponseFormatter::success($subkategori, 'success');
@@ -47,12 +54,18 @@ class SubkategoriController extends Controller
         }
     }
 
+
     // Function untuk mendapatkan subkategori berdasarkan kategori_id
     public function getSubkategoriByKategoriId($kategoriId)
     {
         try {
             // Mencari subkategori berdasarkan kategori_id
             $subkategori = Subkategori::where('kategori_id', $kategoriId)->get();
+
+            $subkategori->transform(function ($item) {
+                $item->image_url = $item->image ? config('app.url') . '/storage/' . $item->image : null;
+                return $item;
+            });
 
             if ($subkategori->isEmpty()) {
                 return ResponseFormatter::error(null, 'Tidak ada subkategori untuk kategori ini', 404);
