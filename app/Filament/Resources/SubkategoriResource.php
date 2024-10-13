@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Exports\SubkategoriExport;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Forms\Form;
@@ -10,10 +11,15 @@ use App\Models\Subkategori;
 use Filament\Resources\Resource;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Forms\Components\FileUpload;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\SubkategoriResource\Pages;
 use App\Filament\Resources\SubkategoriResource\RelationManagers;
+use App\Imports\SubkategoriImport;
+use Maatwebsite\Excel\Facades\Excel;
+use Filament\Tables\Actions\Action;
 
 class SubkategoriResource extends Resource
 {
@@ -34,6 +40,11 @@ class SubkategoriResource extends Resource
                 Forms\Components\TextInput::make('qty')
                     ->required()
                     ->numeric(),
+                FileUpload::make('image')
+                    ->label('image')
+                    ->disk('public')
+                    ->directory('subkategori'),
+                // ->required(),
             ]);
     }
 
@@ -44,6 +55,8 @@ class SubkategoriResource extends Resource
                 TextColumn::make('kategori.nama')->label('Kategori')->sortable(),
                 TextColumn::make('nama')->sortable()->searchable(),
                 TextColumn::make('qty')->sortable(),
+                ImageColumn::make('image')
+                    ->label('Gambar'),
                 TextColumn::make('created_at')->label('Tanggal Ditambahkan')->dateTime(),
             ])
             ->filters([
@@ -56,6 +69,24 @@ class SubkategoriResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
+            ])
+            ->headerActions([
+                // Action::make('export')
+                //     ->label('Export Excel')
+                //     ->icon('heroicon-o-rectangle-stack')
+                //     ->action(fn() => Excel::download(new SubkategoriExport, 'peserta.xlsx')),
+
+                // Action::make('import')
+                //     ->label('Import Excel')
+                //     ->icon('heroicon-o-rectangle-stack')
+                //     ->form([
+                //         Forms\Components\FileUpload::make('file')
+                //             ->required()
+                //             ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
+                //     ])
+                //     ->action(function (array $data) {
+                //         Excel::import(new SubkategoriImport, $data['file']);
+                //     }),
             ]);
     }
 

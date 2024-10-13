@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -39,26 +40,40 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-        ]);
-
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
+        // Validasi input request
+        try {
+            $request->validate([
+                'email' => 'required|string|email',
+                'password' => 'required|string',
             ]);
+        } catch (ValidationException $e) {
+            // Tangani validasi gagal dengan response error
+            return ResponseFormatter::error(
+                'Validation Error',
+                $e->errors(),
+                422
+            );
         }
 
-        // Membuat token baru untuk login user
+        // Mencari user berdasarkan email
+        $user = User::where('email', $request->email)->first();
+
+        // Memeriksa apakah user ditemukan dan password benar
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return ResponseFormatter::error(
+                'The provided credentials are incorrect.',
+                null,
+                401
+            );
+        }
+
+        // Jika login berhasil, buat token baru
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json([
+        return ResponseFormatter::success([
             'access_token' => $token,
             'token_type' => 'Bearer',
-        ]);
+        ], 'Login successful');
     }
 
     /**
@@ -66,11 +81,18 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        // Hapus token saat logout
-        $request->user()->tokens()->delete();
+        try {
+            // Hapus semua token saat logout
+            $request->user()->tokens()->delete();
+        } catch (\Exception $e) {
+            // Tangani error pada saat logout
+            return ResponseFormatter::error(
+                'Logout failed',
+                $e->getMessage(),
+                500
+            );
+        }
 
-        return response()->json([
-            'message' => 'Logout successful',
-        ]);
+        return ResponseFormatter::success(null, 'Logout successful');
     }
 }

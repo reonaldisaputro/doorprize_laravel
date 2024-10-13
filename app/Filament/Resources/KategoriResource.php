@@ -7,8 +7,12 @@ use Filament\Tables;
 use App\Models\Kategori;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
+use App\Imports\KategoriImport;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
+use Maatwebsite\Excel\Facades\Excel;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ViewColumn;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\KategoriResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -34,19 +38,42 @@ class KategoriResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('nama')->sortable()->searchable(),
+                // TextColumn::make('nama')->sortable()->searchable(),
+                TextColumn::make('nama')
+                    ->label('Nama')
+                    ->sortable()
+                    ->formatStateUsing(function ($state) {
+                        return 'Nominal Rp ' . number_format($state, 0, ',', '.');
+                    })->searchable(),
                 TextColumn::make('created_at')->label('Tanggal Ditambahkan')->dateTime(),
+                ViewColumn::make('notes')
+                    ->view('filament.kategori-notes'),
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
+            ])
+            ->headerActions([
+
+                Action::make('import')
+                    ->label('Import Excel')
+                    ->icon('heroicon-o-rectangle-stack')
+                    ->form([
+                        Forms\Components\FileUpload::make('file')
+                            ->required()
+                            ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
+                    ])
+                    ->action(function (array $data) {
+                        Excel::import(new KategoriImport, $data['file']);
+                    }),
             ]);
     }
 

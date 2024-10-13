@@ -45,14 +45,14 @@ class UndianResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('subkategori.nama')->label('Subkategori')->sortable(),
-                TextColumn::make('peserta.nama')->label('Nama Peserta')->sortable(),
-                TextColumn::make('peserta.kode_peserta')->label('Kode Peserta')->sortable(),
+                TextColumn::make('peserta.nama')->label('Nama Peserta')->sortable()->searchable(),
+                TextColumn::make('peserta.kode_peserta')->label('Kode Peserta')->sortable()->searchable(),
                 IconColumn::make('peserta.is_valid') // Update to reflect peserta's is_valid
                     ->boolean()
                     ->label('Valid'),
-                TextColumn::make('peserta.merchant')->label('Merchant')->sortable(),
-                TextColumn::make('peserta.titik_kumpul')->label('Titik Kumpul')->sortable(),
-                TextColumn::make('peserta.nomor_bus')->label('Nomor Bus')->sortable(),
+                TextColumn::make('peserta.merchant')->label('Merchant')->sortable()->searchable(),
+                TextColumn::make('peserta.titik_kumpul')->label('Titik Kumpul')->sortable()->searchable(),
+                TextColumn::make('peserta.nomor_bus')->label('Nomor Bus')->sortable()->searchable(),
                 TextColumn::make('created_at')->label('Tanggal Undian')->dateTime(),
             ])
             ->filters([
