@@ -5,23 +5,54 @@ namespace App\Imports;
 use App\Models\Peserta;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithValidation;
+use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Concerns\WithStartRow;
 
-class PesertaImport implements ToModel, WithValidation
+class PesertaImport implements ToModel, WithStartRow, WithValidation
 {
     /**
      * @param array $row
      *
      * @return \Illuminate\Database\Eloquent\Model|null
      */
+
+    public function startRow(): int
+    {
+        return 2;
+    }
     public function model(array $row)
     {
+        // Cek apakah ada peserta dengan kode_peserta yang sama (termasuk yang soft deleted)
+        $existingPeserta = Peserta::withTrashed()->where('kode_peserta', $row[4])->first();
+
+        if ($existingPeserta) {
+            if ($existingPeserta->trashed()) {
+                // Jika data sudah soft deleted, restore record-nya
+                $existingPeserta->restore();
+
+                // Update data yang di-restore
+                $existingPeserta->update([
+                    'nama' => $row[0],
+                    'merchant' => $row[1],
+                    'titik_kumpul' => $row[2],
+                    'nomor_bus' => $row[3],
+                    'is_valid' => isset($row[5]) ? $row[5] : 0,
+                ]);
+
+                return $existingPeserta;
+            } else {
+                // Jika data sudah ada dan tidak soft deleted, skip (atau Anda bisa memilih untuk update)
+                return null;
+            }
+        }
+
+        // Jika data belum ada, buat peserta baru
         return new Peserta([
             'nama' => $row[0],
             'merchant' => $row[1],
             'titik_kumpul' => $row[2],
             'nomor_bus' => $row[3],
             'kode_peserta' => $row[4],
-            // Set default value untuk is_valid menjadi 0 jika tidak di-set di Excel
             'is_valid' => isset($row[5]) ? $row[5] : 0,
         ]);
     }
@@ -30,11 +61,14 @@ class PesertaImport implements ToModel, WithValidation
     public function rules(): array
     {
         return [
-            '0' => 'required|string',                  // Validasi nama harus ada dan berupa string
-            '1' => 'required|string',                  // Validasi merchant harus ada dan berupa string
-            '2' => 'required|string',                  // Validasi titik kumpul harus ada dan berupa string
-            '3' => 'nullable|string',                  // Nomor bus tidak wajib, tapi harus berupa string
-            '4' => 'required|unique:pesertas,kode_peserta', // Validasi kode peserta harus unik
+            '0' => 'required|string',
+            '1' => 'required|string',
+            '2' => 'required|string',
+            '3' => 'required|string',
+            '4' => [
+                'required',
+                Rule::unique('pesertas', 'kode_peserta')->whereNull('deleted_at'), // Abaikan yang sudah dihapus
+            ],
         ];
     }
 }

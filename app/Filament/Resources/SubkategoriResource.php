@@ -64,6 +64,7 @@ class SubkategoriResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -71,10 +72,10 @@ class SubkategoriResource extends Resource
                 ]),
             ])
             ->headerActions([
-                // Action::make('export')
-                //     ->label('Export Excel')
-                //     ->icon('heroicon-o-rectangle-stack')
-                //     ->action(fn() => Excel::download(new SubkategoriExport, 'peserta.xlsx')),
+                Action::make('export')
+                    ->label('Export Excel')
+                    ->icon('heroicon-o-rectangle-stack')
+                    ->action(fn() => Excel::download(new SubkategoriExport, 'peserta.xlsx')),
 
                 // Action::make('import')
                 //     ->label('Import Excel')

@@ -14,7 +14,7 @@ class KategoriSubkategoriSeeder extends Seeder
      */
     public function run(): void
     {
-        $kategori100 = Kategori::create(['nama' => 'nominal 100 ribu']);
+        $kategori100 = Kategori::create(['nama' => '100000']);
 
         Subkategori::create([
             'kategori_id' => $kategori100->id,
@@ -29,7 +29,7 @@ class KategoriSubkategoriSeeder extends Seeder
         ]);
 
         // Kategori 200 ribu
-        $kategori200 = Kategori::create(['nama' => 'nominal 200 ribu']);
+        $kategori200 = Kategori::create(['nama' => '200000']);
 
         Subkategori::create([
             'kategori_id' => $kategori200->id,
@@ -44,7 +44,7 @@ class KategoriSubkategoriSeeder extends Seeder
         ]);
 
         // Kategori 300 ribu
-        $kategori300 = Kategori::create(['nama' => 'nominal 300 ribu']);
+        $kategori300 = Kategori::create(['nama' => '300000']);
 
         Subkategori::create([
             'kategori_id' => $kategori300->id,

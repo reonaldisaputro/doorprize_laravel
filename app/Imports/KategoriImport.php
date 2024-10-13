@@ -5,15 +5,21 @@ namespace App\Imports;
 use App\Models\Kategori;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithValidation;
+use Maatwebsite\Excel\Concerns\WithStartRow;
 
 
-class KategoriImport implements ToModel, WithValidation
+class KategoriImport implements ToModel, WithValidation, WithStartRow
 {
     /**
      * @param array $row
      *
      * @return \Illuminate\Database\Eloquent\Model|null
      */
+
+    public function startRow(): int
+    {
+        return 2;
+    }
     public function model(array $row)
     {
         return new Kategori([
@@ -24,7 +30,7 @@ class KategoriImport implements ToModel, WithValidation
     public function rules(): array
     {
         return [
-            '0' => 'required|string',
+            '0' => 'required',
         ];
     }
 }

@@ -20,4 +20,12 @@ class Subkategori extends Model
     {
         return $this->hasMany(Undian::class);
     }
+
+    // public function getImageUrlAttribute()
+    // {
+    //     if ($this->image) {
+    //         return config('app.url') . '/storage/' . $this->image;
+    //     }
+    //     return null; // Jika tidak ada gambar
+    // }
 }

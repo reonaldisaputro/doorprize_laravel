@@ -17,6 +17,9 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\KategoriResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\KategoriResource\RelationManagers;
+use Illuminate\Support\Facades\Storage;
+use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\Log;
 
 class KategoriResource extends Resource
 {
@@ -63,16 +66,55 @@ class KategoriResource extends Resource
             ])
             ->headerActions([
 
+                // Action::make('import')
+                //     ->label('Import Excel')
+                //     ->icon('heroicon-o-rectangle-stack')
+                //     ->form([
+                //         Forms\Components\FileUpload::make('file')
+                //             ->required()
+                //             ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
+                //     ])
+                //     ->action(function (array $data) {
+                //         Excel::import(new KategoriImport, $data['file']);
+                //     }),
+
                 Action::make('import')
                     ->label('Import Excel')
                     ->icon('heroicon-o-rectangle-stack')
                     ->form([
                         Forms\Components\FileUpload::make('file')
-                            ->required()
-                            ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
+                            ->disk('public')  // Simpan file di disk 'public'
+                            ->directory('kategori-excel')  // Simpan file di folder 'peserta' dalam disk 'public'
+                            ->required()  // Membuat input file wajib
+                            ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']) // Khusus file Excel (.xlsx)
+
                     ])
                     ->action(function (array $data) {
-                        Excel::import(new KategoriImport, $data['file']);
+                        try {
+                            $path = $data['file'];
+                            if (Storage::disk('public')->exists($path)) {
+                                Excel::import(new KategoriImport, Storage::disk('public')->path($path));
+                                Notification::make()
+                                    ->title('Import berhasil')
+                                    ->body('Data peserta berhasil diimport.')
+                                    ->success()
+                                    ->send();
+                            } else {
+                                Notification::make()
+                                    ->title('File tidak ditemukan')
+                                    ->body('File yang diunggah tidak dapat ditemukan. Coba ulangi.')
+                                    ->danger()
+                                    ->send();
+                            }
+                        } catch (\Exception $e) {
+
+                            \Illuminate\Support\Facades\Log::error('Error during import: ' . $e->getMessage());
+                            Notification::make()
+                                ->title('Import gagal')
+                                ->body('Terjadi kesalahan: ' . $e->getMessage())
+                                ->danger()
+                                ->send();
+                        }
                     }),
             ]);
     }

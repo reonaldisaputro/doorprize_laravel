@@ -17,8 +17,11 @@ use App\Filament\Resources\PesertaResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\PesertaResource\RelationManagers;
 use Filament\Tables\Columns\IconColumn;
+use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use Filament\Tables\Actions\Action;
+use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\Log;
 
 class PesertaResource extends Resource
 {
@@ -74,6 +77,8 @@ class PesertaResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -81,6 +86,49 @@ class PesertaResource extends Resource
                 ]),
             ])
             ->headerActions([
+                Action::make('resetPeserta')
+                    ->label('Hapus Semua Peserta dan Data Terkait')
+                    ->color('danger')
+                    ->icon('heroicon-o-trash')
+                    ->requiresConfirmation()
+                    ->action(function () {
+                        // Hapus semua data di tabel 'undians' terlebih dahulu
+                        \App\Models\Undian::query()->delete();
+
+                        // Kemudian hapus data di tabel 'pesertas'
+                        \App\Models\Peserta::query()->delete();
+
+                        Notification::make()
+                            ->title('Semua Data Peserta dan Undian Terkait Telah Dihapus')
+                            ->success()
+                            ->send();
+                    }),
+
+                Action::make('resetAndImport')
+                    ->label('Reset dan Import Excel')
+                    ->color('danger')
+                    ->icon('heroicon-o-trash')
+                    ->requiresConfirmation()
+                    ->form([
+                        Forms\Components\FileUpload::make('file')
+                            ->required()
+                            ->label('Pilih File Excel')
+                            ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
+                            ->directory('peserta')
+                            ->disk('public'),
+                    ])
+                    ->action(function (array $data) {
+                        // Hapus semua data peserta
+                        Peserta::query()->delete();
+
+                        // Import file Excel yang baru
+                        Excel::import(new PesertaImport, Storage::disk('public')->path($data['file']));
+
+                        Notification::make()
+                            ->title('Data Peserta Telah Direset dan Diimport')
+                            ->success()
+                            ->send();
+                    }),
                 Action::make('export')
                     ->label('Export Excel')
                     ->icon('heroicon-o-rectangle-stack')
@@ -91,12 +139,41 @@ class PesertaResource extends Resource
                     ->icon('heroicon-o-rectangle-stack')
                     ->form([
                         Forms\Components\FileUpload::make('file')
-                            ->required()
-                            ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
+                            ->disk('public')  // Simpan file di disk 'public'
+                            ->directory('peserta-excel')  // Simpan file di folder 'peserta' dalam disk 'public'
+                            ->required()  // Membuat input file wajib
+                            ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']) // Khusus file Excel (.xlsx)
+
                     ])
                     ->action(function (array $data) {
-                        Excel::import(new PesertaImport, $data['file']);
+                        try {
+                            $path = $data['file'];
+                            if (Storage::disk('public')->exists($path)) {
+                                Excel::import(new PesertaImport, Storage::disk('public')->path($path));
+                                Notification::make()
+                                    ->title('Import berhasil')
+                                    ->body('Data peserta berhasil diimport.')
+                                    ->success()
+                                    ->send();
+                            } else {
+                                Notification::make()
+                                    ->title('File tidak ditemukan')
+                                    ->body('File yang diunggah tidak dapat ditemukan. Coba ulangi.')
+                                    ->danger()
+                                    ->send();
+                            }
+                        } catch (\Exception $e) {
+
+                            \Illuminate\Support\Facades\Log::error('Error during import: ' . $e->getMessage());
+                            Notification::make()
+                                ->title('Import gagal')
+                                ->body('Terjadi kesalahan: ' . $e->getMessage())
+                                ->danger()
+                                ->send();
+                        }
                     }),
+
+
             ]);
     }
 
