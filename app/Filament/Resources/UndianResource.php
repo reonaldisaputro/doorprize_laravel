@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Exports\UndianExport;
 use Filament\Forms;
 use Filament\Tables;
 use App\Models\Undian;
@@ -15,6 +16,8 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\UndianResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\UndianResource\RelationManagers;
+use Maatwebsite\Excel\Facades\Excel;
+use Filament\Tables\Actions\Action;
 
 class UndianResource extends Resource
 {
@@ -65,6 +68,12 @@ class UndianResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
+            ])
+            ->headerActions([
+                Action::make('export')
+                    ->label('Export Excel')
+                    ->icon('heroicon-o-rectangle-stack')
+                    ->action(fn() => Excel::download(new UndianExport, 'undian.xlsx')),
             ]);
     }
 

@@ -61,10 +61,10 @@ class PesertaImport implements ToModel, WithStartRow, WithValidation
     public function rules(): array
     {
         return [
-            '0' => 'required|string',
-            '1' => 'required|string',
-            '2' => 'required|string',
-            '3' => 'required|string',
+            '0' => 'required',
+            '1' => 'required',
+            '2' => 'required',
+            '3' => 'required',
             '4' => [
                 'required',
                 Rule::unique('pesertas', 'kode_peserta')->whereNull('deleted_at'), // Abaikan yang sudah dihapus

@@ -172,10 +172,7 @@ class UndianController extends Controller
 
             // Jika total peserta yang sudah diundi sama dengan qty subkategori, hentikan undian
             if ($totalPesertaDiundi >= $subkategori->qty) {
-                $isDone = [
-                    'is_done' => true
-                ];
-                return ResponseFormatter::error($isDone, 'Undian untuk subkategori ini sudah selesai, semua peserta telah diundi', 400);
+                return ResponseFormatter::success(['is_done' => true], 'Undian untuk subkategori ini sudah selesai, semua peserta telah diundi', 400);
             }
 
             // Buat aturan batch otomatis: 20, 20, dan 10 (atau lainnya sesuai dengan qty subkategori)
@@ -184,12 +181,9 @@ class UndianController extends Controller
             // Tentukan batch yang akan dijalankan berdasarkan peserta yang sudah diundi
             $batchIndex = intdiv($totalPesertaDiundi, 20); // Index batch (0, 1, atau 2)
 
-            // Jika batchIndex melebihi jumlah batch (misal undian selesai), hentikan undian
+            // Jika batchIndex melebihi jumlah batch, hentikan undian
             if ($batchIndex >= count($batchSizes)) {
-                $isDone = [
-                    'is_done' => true
-                ];
-                return ResponseFormatter::error($isDone, 'Semua peserta sudah diundi dalam semua batch', 400);
+                return ResponseFormatter::success(['is_done' => true], 'Semua peserta sudah diundi dalam semua batch', 400);
             }
 
             // Ambil jumlah peserta yang harus diundi dalam batch ini, 
@@ -233,12 +227,27 @@ class UndianController extends Controller
                 $p->save();
             }
 
+            // Hitung total peserta diundi setelah batch ini
+            $totalPesertaDiundiSetelahBatch = Undian::where('subkategori_id', $subkategoriId)->count();
+
+            // Cek jika ini batch terakhir (sudah mencapai total qty), set is_done menjadi true
+            $isDone = $totalPesertaDiundiSetelahBatch >= $subkategori->qty;
+
+            // Update data winners dengan is_done status
+            foreach ($winners as &$winner) {
+                $winner['is_done'] = $isDone;
+            }
+
+            // Jika sudah batch terakhir, kirimkan pesan dengan is_done true
+            $message = $isDone ? 'Undian batch terakhir berhasil dilakukan, undian selesai.' : 'Undian batch ' . ($batchIndex + 1) . ' berhasil dilakukan';
+
             // Return success response dengan ResponseFormatter
-            return ResponseFormatter::success($winners, 'Undian batch ' . ($batchIndex + 1) . ' berhasil dilakukan');
+            return ResponseFormatter::success($winners, $message);
         } catch (\Exception $e) {
             return ResponseFormatter::error(null, 'Terjadi kesalahan: ' . $e->getMessage(), 500);
         }
     }
+
 
     public function history()
     {

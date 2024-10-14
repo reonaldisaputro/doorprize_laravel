@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('subkategoris', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('kategori_id')->constrained('kategoris');
+            $table->foreignId('kategori_id')->constrained('kategoris')->onDelete('cascade');
             $table->string('nama');
             $table->integer('qty');
             $table->timestamps();
