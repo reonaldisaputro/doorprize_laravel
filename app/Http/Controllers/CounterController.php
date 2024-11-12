@@ -20,6 +20,7 @@ class CounterController extends Controller
 
             // Variabel untuk menyimpan pesan
             $message = "";
+            $is_last = false; // Variabel untuk menandai apakah ini subkategori terakhir
 
             // Jika tidak ada counter, buat satu dengan nilai awal 1
             if (!$counter) {
@@ -36,13 +37,20 @@ class CounterController extends Controller
                 } else {
                     $message = "Nilai counter telah mencapai maksimum.";
                 }
+
+                // Cek apakah ini subkategori terakhir
+                if ($counter->count == $jumlahSubkategori) {
+                    $is_last = true;  // Tandai ini sebagai subkategori terakhir
+                    $message = "Ini merupakan subkategori terakhir.";
+                }
             }
 
-            // Kembalikan nilai counter dan pesan dalam objek data
+            // Kembalikan nilai counter, is_last, dan pesan dalam objek data
             return response()->json([
                 'code' => 200,
                 'data' => [
                     'count' => $counter->count,
+                    'is_last' => $is_last,
                     'message' => $message,
                 ]
             ], 200);

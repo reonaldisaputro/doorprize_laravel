@@ -16,7 +16,7 @@ class PesertaSeeder extends Seeder
     {
         $faker = Faker::create();
 
-        for ($i = 1; $i <= 200; $i++) {
+        for ($i = 1; $i <= 400; $i++) {
             Peserta::create([
                 'nama' => $faker->name,     // Email acak dan unik
                 'merchant' => $faker->company,                 // Merchant acak

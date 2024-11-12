@@ -19,4 +19,9 @@ class Peserta extends Model
         'is_valid'
     ];
     protected $dates = ['deleted_at'];
+
+    public function undian()
+    {
+        return $this->hasMany(Undian::class);
+    }
 }

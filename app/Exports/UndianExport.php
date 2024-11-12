@@ -26,6 +26,7 @@ class UndianExport implements FromCollection, WithHeadings, WithCustomStartCell,
                     'Peserta' => $undian->peserta->nama,  // Mengambil nama peserta
                     'Merchant' => $undian->peserta->merchant,  // Mengambil merchant dari peserta
                     'Kode Peserta' => $undian->peserta->kode_peserta,  // Mengambil kode peserta
+                    'Status Valid' => $undian->peserta->is_valid ? 'Valid' : 'Tidak Valid',  // Status validasi peserta
                     'Tanggal Undian' => $undian->created_at->format('Y-m-d H:i:s'),  // Tanggal undian
                 ];
             });
@@ -42,6 +43,7 @@ class UndianExport implements FromCollection, WithHeadings, WithCustomStartCell,
             'Peserta',
             'Merchant',
             'Kode Peserta',
+            'Status Valid',  // Tambahkan heading untuk is_valid
             'Tanggal Undian'
         ];
     }

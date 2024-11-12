@@ -44,6 +44,10 @@ class SubkategoriResource extends Resource
                     ->label('image')
                     ->disk('public')
                     ->directory('subkategori'),
+                FileUpload::make('image_title')
+                    ->label('Image Title')
+                    ->disk('public')
+                    ->directory('subkategori_title'),
                 // ->required(),
             ]);
     }
@@ -52,11 +56,15 @@ class SubkategoriResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('kategori.nama')->label('Kategori')->sortable(),
+                TextColumn::make('kategori.nama')->label('Kategori')->sortable()->formatStateUsing(function ($state) {
+                    return 'Nominal Rp ' . number_format($state, 0, ',', '.');
+                })->searchable(),
                 TextColumn::make('nama')->sortable()->searchable(),
                 TextColumn::make('qty')->sortable(),
                 ImageColumn::make('image')
                     ->label('Gambar'),
+                ImageColumn::make('image_title')
+                    ->label('Gambar Title'),
                 TextColumn::make('created_at')->label('Tanggal Ditambahkan')->dateTime(),
             ])
             ->filters([
@@ -72,10 +80,10 @@ class SubkategoriResource extends Resource
                 ]),
             ])
             ->headerActions([
-                Action::make('export')
-                    ->label('Export Excel')
-                    ->icon('heroicon-o-rectangle-stack')
-                    ->action(fn() => Excel::download(new SubkategoriExport, 'peserta.xlsx')),
+                // Action::make('export')
+                //     ->label('Export Excel')
+                //     ->icon('heroicon-o-rectangle-stack')
+                //     ->action(fn() => Excel::download(new SubkategoriExport, 'peserta.xlsx')),
 
                 // Action::make('import')
                 //     ->label('Import Excel')

@@ -25,6 +25,11 @@ class SubkategoriController extends Controller
                 return $item;
             });
 
+            $subkategori->transform(function ($item) {
+                $item->image_title_url = $item->image ? config('app.url') . '/storage/' . $item->image_title : null;
+                return $item;
+            });
+
             return ResponseFormatter::success($subkategori, 'success');
         } catch (\Exception $e) {
             return ResponseFormatter::error('Terjadi kesalahan saat mengambil data', $e->getMessage(), 500);
@@ -46,6 +51,10 @@ class SubkategoriController extends Controller
             // Jika subkategori memiliki gambar, buat URL lengkap
             if ($subkategori->image) {
                 $subkategori->image_url = config('app.url') . '/storage/' . $subkategori->image;
+            }
+
+            if ($subkategori->image_title) {
+                $subkategori->image_title_url = config('app.url') . '/storage/' . $subkategori->image_title;
             }
 
             return ResponseFormatter::success($subkategori, 'success');

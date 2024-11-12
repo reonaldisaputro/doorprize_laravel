@@ -35,11 +35,15 @@ class UndianResource extends Resource
                 Forms\Components\Select::make('peserta_id')
                     ->relationship('peserta', 'nama')
                     ->required(),
-                Checkbox::make('peserta_id')
-                    ->relationship('peserta', 'is_valid')
-                    ->label('Validasi Peserta')
-                    ->helperText('Tandai peserta sebagai valid untuk ikut undian.')
-                    ->required(),
+                // Forms\Components\Select::make('peserta_id')
+                //     ->relationship('peserta', 'is_valid')
+                //     ->label('Status Validasi')
+                //     ->options([
+                //         0 => 'Tidak Valid',  // Nilai 0 untuk "Tidak Valid"
+                //         1 => 'Valid',        // Nilai 1 untuk "Valid"
+                //     ])
+                //     ->default(0)  // Nilai default jika diperlukan
+                //     ->required(),
             ]);
     }
 

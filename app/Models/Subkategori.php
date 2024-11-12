@@ -9,7 +9,7 @@ class Subkategori extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['kategori_id', 'nama', 'qty', 'image'];
+    protected $fillable = ['kategori_id', 'nama', 'qty', 'image', 'image_title'];
 
     public function kategori()
     {
